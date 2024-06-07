@@ -148,10 +148,10 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul id="top-menu" class="nav navbar-nav navbar-right main-nav">
-              <li class="active"><a href="index.html">Home</a></li>
+              <li class=""><a href="index.html">Home</a></li>
 
-              <li><a href="gallery.html">Blog</a></li>
-              <li><a href="gallery.html">Courses</a></li>
+              <li><a href="{% url 'blog' %}">Blog</a></li>
+              <li><a href="{% url 'course' %}">Courses</a></li>
               <li><a href="contact.html">Contact</a></li>
               {% comment %}
               <li class="dropdown">
