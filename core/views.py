@@ -90,11 +90,6 @@ def view_cart(request):
     }
     return render(request, 'cart.html', context)
 
-def checkout(request):
-    # Implement your checkout logic here, like clearing the cart or saving order details
-    request.session.pop('cart', None)  # Clear the cart after checkout
-    return render(request, 'checkout.html')
-
 
 def course_detail(request, id):
     context = {}
