@@ -14,7 +14,7 @@ def blog(request):
     return render(request, 'blog.html', context)
 
 
-def blogpost(request, id):
+def blog_post(request, id):
     context = {}
     return render(request, 'blog-post.html', context)
 
@@ -22,6 +22,11 @@ def blogpost(request, id):
 def courses(request):
     context = {}
     return render(request, 'course.html', context)
+
+
+def course_detail(request, id):
+    context = {}
+    return render(request, 'course-detail.html', context)
 
 
 def contact(request):
