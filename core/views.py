@@ -36,7 +36,14 @@ def blog_post(request, id):
 
 
 def courses(request):
-    context = {}
+    courses = Course.objects.all()
+    paginator = Paginator(courses, 6) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj":page_obj,
+    }
     return render(request, 'course.html', context)
 
 
