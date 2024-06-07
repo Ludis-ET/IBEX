@@ -1,23 +1,5 @@
 {% extends 'base.html' %} {% load static %} {% block body %}
 
-<div id="mu-search">
-  <div class="mu-search-area">
-    <button class="mu-search-close"><span class="fa fa-close"></span></button>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <form class="mu-search-form">
-            <input
-              type="search"
-              placeholder="Type Your Keyword(s) & Hit Enter"
-            />
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <section id="mu-page-breadcrumb">
   <div class="container">
     <div class="row">
@@ -71,117 +53,87 @@
                 </div>
               </div>
               <div class="mu-pagination">
-    <nav>
-      <ul class="pagination">
-        {% if page_obj.has_previous %}
-          <li>
-            <a href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-              <span class="fa fa-angle-left"></span> Prev
-            </a>
-          </li>
-        {% else %}
-          <li class="disabled">
-            <span aria-label="Previous">
-              <span class="fa fa-angle-left"></span> Prev
-            </span>
-          </li>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-          {% if page_obj.number == num %}
-            <li class="active"><a href="?page={{ num }}">{{ num }}</a></li>
-          {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
-            <li><a href="?page={{ num }}">{{ num }}</a></li>
-          {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-          <li>
-            <a href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-              Next <span class="fa fa-angle-right"></span>
-            </a>
-          </li>
-        {% else %}
-          <li class="disabled">
-            <span aria-label="Next">
-              Next <span class="fa fa-angle-right"></span>
-            </span>
-          </li>
-        {% endif %}
-      </ul>
-    </nav>
-  </div>
+                <nav>
+                  <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li>
+                      <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        aria-label="Previous"
+                      >
+                        <span class="fa fa-angle-left"></span> Prev
+                      </a>
+                    </li>
+                    {% else %}
+                    <li class="disabled">
+                      <span aria-label="Previous">
+                        <span class="fa fa-angle-left"></span> Prev
+                      </span>
+                    </li>
+                    {% endif %} {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="active">
+                      <a href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                    <li><a href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %} {% endfor %} {% if page_obj.has_next %}
+                    <li>
+                      <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        aria-label="Next"
+                      >
+                        Next <span class="fa fa-angle-right"></span>
+                      </a>
+                    </li>
+                    {% else %}
+                    <li class="disabled">
+                      <span aria-label="Next">
+                        Next <span class="fa fa-angle-right"></span>
+                      </span>
+                    </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+              </div>
             </div>
             <div class="col-md-3">
               <aside class="mu-sidebar">
                 <div class="mu-single-sidebar">
                   <h3>Categories</h3>
                   <ul class="mu-sidebar-catg">
-                    <li><a href="#">Web Design</a></li>
-                    <li><a href="#">Web Development</a></li>
-                    <li><a href="#">Math</a></li>
-                    <li><a href="#">Physics</a></li>
-                    <li><a href="#">Chemistry</a></li>
-                    <li><a href="#">English</a></li>
+                    {% for c in categories %}
+                    <li><a href="#">{{c.name}}</a></li>
+                    {% endfor %}
                   </ul>
                 </div>
                 <div class="mu-single-sidebar">
-                  <h3>Popular News</h3>
+                  <h3>Recent News</h3>
                   <div class="mu-sidebar-popular-courses">
+                    {% for blog in page_obj.object_list|slice:":3" %}
                     <div class="media">
                       <div class="media-left">
                         <a href="#">
                           <img
                             class="media-object"
-                            src="{% static 'assets/img/courses/1.jpg' %}"
+                            src="{{ blog.poster.url }}"
                             alt="img"
                           />
                         </a>
                       </div>
                       <div class="media-body">
                         <h4 class="media-heading">
-                          <a href="#">Medical Science</a>
+                          <a href="#">{{blog.title}}</a>
                         </h4>
-                        <span class="popular-course-price">$200.00</span>
+                        <span class="popular-course-price"
+                          >{{ blog.posted_date}}</span
+                        >
                       </div>
                     </div>
-                    <div class="media">
-                      <div class="media-left">
-                        <a href="#">
-                          <img
-                            class="media-object"
-                            src="{% static 'assets/img/courses/2.jpg' %}"
-                            alt="img"
-                          />
-                        </a>
-                      </div>
-                      <div class="media-body">
-                        <h4 class="media-heading">
-                          <a href="#">Web Design</a>
-                        </h4>
-                        <span class="popular-course-price">$250.00</span>
-                      </div>
-                    </div>
-                    <div class="media">
-                      <div class="media-left">
-                        <a href="#">
-                          <img
-                            class="media-object"
-                            src="{% static 'assets/img/courses/3.jpg' %}"
-                            alt="img"
-                          />
-                        </a>
-                      </div>
-                      <div class="media-body">
-                        <h4 class="media-heading">
-                          <a href="#">Health & Sports</a>
-                        </h4>
-                        <span class="popular-course-price">$90.00</span>
-                      </div>
-                    </div>
+                    {% endfor %}
                   </div>
                 </div>
-                <div class="mu-single-sidebar">
+                {% comment %} <div class="mu-single-sidebar">
                   <h3>Archives</h3>
                   <ul class="mu-sidebar-catg mu-sidebar-archives">
                     <li>
@@ -203,18 +155,13 @@
                       <a href="#">October <span>(85)</span></a>
                     </li>
                   </ul>
-                </div>
+                </div> {% endcomment %}
                 <div class="mu-single-sidebar">
                   <h3>Tags Cloud</h3>
                   <div class="tag-cloud">
-                    <a href="#">Health</a>
-                    <a href="#">Science</a>
-                    <a href="#">Sports</a>
-                    <a href="#">Mathematics</a>
-                    <a href="#">Web Design</a>
-                    <a href="#">Admission</a>
-                    <a href="#">History</a>
-                    <a href="#">Environment</a>
+                    {% for i in tags %}
+                    <a href="#">{{i.name}}</a>
+                    {% endfor %}
                   </div>
                 </div>
               </aside>

@@ -14,6 +14,8 @@ def index(request):
 
 def blog(request):
     blogs = Blog.objects.all()
+    categories = Category.objects.all()
+    tags = Tag.objects.all()
     paginator = Paginator(blogs, 6) 
 
     page_number = request.GET.get('page')
@@ -21,6 +23,8 @@ def blog(request):
 
     context = {
         "page_obj": page_obj,
+        "categories":categories,
+        "tags":tags,
     }
     return render(request, 'blog.html', context)
 
