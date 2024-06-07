@@ -17,3 +17,8 @@ def blog(request):
 def courses(request):
     context = {}
     return render(request, 'course.html', context)
+
+
+def contact(request):
+    context = {}
+    return render(request, 'contact.html', context)
