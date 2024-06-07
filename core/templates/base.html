@@ -140,19 +140,19 @@
             </button>
             <!-- LOGO -->
             <!-- TEXT BASED LOGO -->
-            <a class="navbar-brand" href="index.html"
+            <a class="navbar-brand" href="{% url 'home' %}"
               ><i class="fa fa-university"></i><span>IBX</span></a
             >
             <!-- IMG BASED LOGO  -->
-            <!-- <a class="navbar-brand" href="index.html"><img src="{% static 'assets/img/logo.png' %}" alt="logo"></a> -->
+            <!-- <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static 'assets/img/logo.png' %}" alt="logo"></a> -->
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul id="top-menu" class="nav navbar-nav navbar-right main-nav">
-              <li class=""><a href="index.html">Home</a></li>
+              <li class=""><a href="{% url 'home' %}">Home</a></li>
 
               <li><a href="{% url 'blog' %}">Blog</a></li>
               <li><a href="{% url 'course' %}">Courses</a></li>
-              <li><a href="contact.html">Contact</a></li>
+              <li><a href="{% url 'contact' %}">Contact Us</a></li>
               {% comment %}
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"
@@ -210,6 +210,7 @@
                   </ul>
                 </div>
               </div>
+              {% comment %}
               <div class="col-lg-3 col-md-3 col-sm-3">
                 <div class="mu-footer-widget">
                   <h4>News letter</h4>
@@ -222,6 +223,7 @@
                   </form>
                 </div>
               </div>
+              {% endcomment %}
               <div class="col-lg-3 col-md-3 col-sm-3">
                 <div class="mu-footer-widget">
                   <h4>Contact</h4>
