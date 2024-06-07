@@ -55,7 +55,7 @@
 
 			<div class="right">
 				<h1 class="total">Total: $<span>{{total_price}}</span></h1>
-				<a class="btn">Checkout</a>
+				<div id="paypal-button-container"></div>
 			</div>
 
 		</div>
@@ -67,4 +67,55 @@
 
 {% block js %}
 <script src="{% static 'assets/cart/script.js' %}"></script>
+<script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+
+<script>
+    // Render the PayPal button into #paypal-button-container
+    paypal.Buttons({
+
+        // Call your server to set up the transaction
+        createOrder: function(data, actions) {
+            // Fetch the total price from the server or calculate it here
+            var totalPrice = {{total_price}}; // Replace 100 with the actual total price
+
+            return fetch('/demo/checkout/api/paypal/order/create/', {
+                method: 'post'
+            }).then(function(res) {
+                return res.json();
+            }).then(function(orderData) {
+                return orderData.id;
+            });
+        },
+
+        // Call your server to finalize the transaction
+        onApprove: function(data, actions) {
+            return fetch('/demo/checkout/api/paypal/order/' + data.orderID + '/capture/', {
+                method: 'post'
+            }).then(function(res) {
+                return res.json();
+            }).then(function(orderData) {
+                // Check if there's any error in the response
+                if (orderData.error) {
+                    // Show a failure message if there's an error
+                    alert('Sorry, your transaction could not be processed.\n\n' + orderData.error);
+                    return;
+                }
+
+                // Successful capture!
+                console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                var transaction = orderData.purchase_units[0].payments.captures[0];
+                alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nThank you for your payment!');
+
+                // You can optionally redirect the user to a thank you page
+                // actions.redirect('thank_you.html');
+            }).catch(function(error) {
+                // Show a failure message for any unexpected errors
+                alert('Sorry, your transaction could not be processed.\n\n' + error.message);
+            });
+        }
+
+    }).render('#paypal-button-container');
+</script>
+
+
 {% endblock %}
