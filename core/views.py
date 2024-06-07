@@ -5,4 +5,10 @@ from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse("Ludis")
+    context = {}
+    return render(request, 'index.html', context)
+
+
+def blog(request):
+    context = {}
+    return render(request, 'blog.html', context)
