@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'assets/cart/demo.css' %}">
+<link rel="stylesheet" href="{% static 'assets/cart/style.css' %}">
+{% endblock %}
+
+{% block body %}
+<main style="padding:10px;">
+<header id="site-header">
+		<div class="container">
+			<h1>Course cart</h1>
+		</div>
+	</header>
+
+	<div class="container" style="padding: 20px;">
+
+		<section id="cart"> 
+
+            {% for course in cart_courses %}
+			<article class="product">
+				<header>
+					<a href="{% url 'remove_from_cart' course.id %}" class="remove">
+						<img src="{{course.poster.url}}" alt="Gamming Mouse">
+
+						<h3>Remove product</h3>
+					</a>
+				</header>
+
+				<div class="content">
+
+					<h1>{{course.title}}</h1>
+
+					{{course.description | slice:":300"}}...
+					<div title="You have selected this product to be shipped in the color yellow." style="top: 0" class="color yellow"></div>
+				</div>
+
+				<footer class="content">
+
+					<h2 class="price">
+						${{course.price}}
+					</h2>
+				</footer>
+			</article>
+            {% endfor %}
+
+		</section>
+
+	</div>
+
+	<footer id="site-footer">
+		<div class="container clearfix">
+
+			<div class="right">
+				<h1 class="total">Total: $<span>{{total_price}}</span></h1>
+				<a class="btn">Checkout</a>
+			</div>
+
+		</div>
+	</footer>
+     <!-- END EDMO HTML (Happy Coding!)-->
+ </main>
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'assets/cart/script.js' %}"></script>
+{% endblock %}

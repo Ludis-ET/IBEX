@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from .models import *
 
@@ -7,7 +7,10 @@ from .models import *
 
 
 def index(request):
-    context = {}
+    cart_count = len(request.session.get('cart', []))
+    context = {
+        "cart_count":cart_count,
+    }
     return render(request, 'index.html', context)
 
 
@@ -21,7 +24,9 @@ def blog(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    cart_count = len(request.session.get('cart', []))
     context = {
+        "cart_count":cart_count,
         "page_obj": page_obj,
         "categories":categories,
         "tags":tags,
@@ -31,20 +36,64 @@ def blog(request):
 
 
 def blog_post(request, id):
-    context = {}
+    cart_count = len(request.session.get('cart', []))
+    context = {
+        "cart_count":cart_count,
+    }
     return render(request, 'blog-post.html', context)
 
 
 def courses(request):
     courses = Course.objects.all()
+    categories = Category.objects.all()
+    tags = Tag.objects.all()
     paginator = Paginator(courses, 6) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    cart_count = len(request.session.get('cart', []))
+    cart_ids = request.session.get('cart', [])
 
     context = {
-        "page_obj":page_obj,
+        "page_obj": page_obj,
+        "categories": categories,
+        "tags": tags,
+        "cart_count":cart_count,
+        "cart_ids":cart_ids,
     }
     return render(request, 'course.html', context)
+def add_to_cart(request, course_id):
+    course = Course.objects.get(id=course_id)
+    cart = request.session.get('cart', [])
+    if course.id not in cart:  # Check if the course is not already in the cart
+        cart.append(course.id)
+        request.session['cart'] = cart
+    return redirect('courses')
+
+
+def remove_from_cart(request, course_id):
+    course = Course.objects.get(id=course_id)
+    cart = request.session.get('cart', [])
+    if course.id in cart:
+        cart.remove(course.id)
+        request.session['cart'] = cart
+    return redirect('view_cart')
+
+def view_cart(request):
+    cart_ids = request.session.get('cart', [])
+    cart_courses = Course.objects.filter(id__in=cart_ids)
+    cart_count = len(request.session.get('cart', []))
+    total_price = sum(course.price for course in cart_courses)
+    context = {
+        'cart_courses': cart_courses,
+        'total_price': total_price,
+        'cart_count': cart_count,
+    }
+    return render(request, 'cart.html', context)
+
+def checkout(request):
+    # Implement your checkout logic here, like clearing the cart or saving order details
+    request.session.pop('cart', None)  # Clear the cart after checkout
+    return render(request, 'checkout.html')
 
 
 def course_detail(request, id):
@@ -53,5 +102,9 @@ def course_detail(request, id):
 
 
 def contact(request):
-    context = {}
+    
+    cart_count = len(request.session.get('cart', []))
+    context = {
+        "cart_count":cart_count,
+    }
     return render(request, 'contact.html', context)
