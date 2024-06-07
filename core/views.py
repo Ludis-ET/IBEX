@@ -14,6 +14,11 @@ def blog(request):
     return render(request, 'blog.html', context)
 
 
+def blogpost(request):
+    context = {}
+    return render(request, 'blog-post.html', context)
+
+
 def courses(request):
     context = {}
     return render(request, 'course.html', context)
