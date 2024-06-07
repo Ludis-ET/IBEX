@@ -1,5 +1,7 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render
-from django.http import HttpResponse
+
+from .models import *
 
 
 
@@ -9,9 +11,19 @@ def index(request):
     return render(request, 'index.html', context)
 
 
+
 def blog(request):
-    context = {}
+    blogs = Blog.objects.all()
+    paginator = Paginator(blogs, 6) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        "page_obj": page_obj,
+    }
     return render(request, 'blog.html', context)
+
 
 
 def blog_post(request, id):
