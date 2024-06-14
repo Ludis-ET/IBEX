@@ -14,6 +14,21 @@ def index(request):
     return render(request, 'index.html', context)
 
 
+def about_us(request):
+    cart_count = len(request.session.get('cart', []))
+    context = {
+        "cart_count":cart_count,
+    }
+    return render(request, 'about-us.html', context)
+
+
+def faq(request):
+    cart_count = len(request.session.get('cart', []))
+    context = {
+        "cart_count":cart_count,
+    }
+    return render(request, 'faq.html', context)
+
 
 def blog(request):
     blogs = Blog.objects.all()
@@ -32,7 +47,6 @@ def blog(request):
         "tags":tags,
     }
     return render(request, 'blog.html', context)
-
 
 
 def blog_post(request, id):
@@ -61,6 +75,8 @@ def courses(request):
         "cart_ids":cart_ids,
     }
     return render(request, 'course.html', context)
+
+
 def add_to_cart(request, course_id):
     course = Course.objects.get(id=course_id)
     cart = request.session.get('cart', [])
@@ -77,6 +93,7 @@ def remove_from_cart(request, course_id):
         cart.remove(course.id)
         request.session['cart'] = cart
     return redirect('view_cart')
+
 
 def view_cart(request):
     cart_ids = request.session.get('cart', [])
