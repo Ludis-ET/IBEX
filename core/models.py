@@ -40,3 +40,27 @@ class Course(models.Model):
     def __str__(self):
         return self.title
     
+
+
+class Checkout(models.Model):
+    PAYMENT_STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('COMPLETED', 'Completed'),
+        ('FAILED', 'Failed'),
+    ]
+
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    address = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=255)
+    courses = models.ManyToManyField(Course, related_name='checkouts')
+    total = models.DecimalField(decimal_places=2, max_digits=6)
+    date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='PENDING')
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name} - {self.date}'

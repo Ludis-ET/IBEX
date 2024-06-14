@@ -2,6 +2,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 
 from .models import *
+from .forms import CheckoutForm
 
 
 
@@ -111,6 +112,52 @@ def view_cart(request):
 def course_detail(request, id):
     context = {}
     return render(request, 'course-detail.html', context)
+
+
+def checkout(request):
+    cart = request.session.get('cart', {})
+    if not cart:
+        return redirect('cart_view')
+
+    if request.method == 'POST':
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            checkout = Checkout(
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                email=form.cleaned_data['email'],
+                address=form.cleaned_data['address'],
+                city=form.cleaned_data['city'],
+                state=form.cleaned_data['state'],
+                postal_code=form.cleaned_data['postal_code'],
+                country=form.cleaned_data['country'],
+                total=sum(item['price'] for item in cart.values())
+            )
+            checkout.save()
+            for course_id, course_data in cart.items():
+                course = Course.objects.get(id=course_id)
+                checkout.courses.add(course)
+            # Simulate payment process
+            payment_successful = process_payment(checkout.total)
+            if payment_successful:
+                checkout.status = 'COMPLETED'
+            else:
+                checkout.status = 'FAILED'
+            checkout.save()
+            # Clear the cart
+            request.session['cart'] = {}
+            return render(request, 'checkout_success.html', {'checkout': checkout})
+    else:
+        form = CheckoutForm()
+
+    return render(request, 'checkout.html', {'form': form})
+
+
+def process_payment(total):
+    # Simulate payment processing
+    # Replace with actual payment processing logic
+    return True  # Assume payment is always successful for this example
+
 
 
 def contact(request):
