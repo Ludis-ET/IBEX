@@ -119,7 +119,7 @@ def course_detail(request, id):
     return render(request, 'course-detail.html', context)
 
 
-@csrf_exempt
+@csrf_exempt  # Ensure CSRF exemption depending on your setup
 def checkout(request):
     cart = request.session.get('cart', [])
     if not cart:
@@ -132,29 +132,36 @@ def checkout(request):
         "business": settings.PAYPAL_RECEIVER_EMAIL,
         "amount": total,
         "item_name": "Course Purchase",  # Modify as per your product details
-        "invoice": uuid.uuid4(),  # Generate a unique invoice ID
+        "invoice": str(uuid.uuid4()),  # Generate a unique invoice ID
         "currency_code": "USD",
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
         "return_url": request.build_absolute_uri(reverse('payment-success')),  # Adjust URLs as per your setup
         "cancel_return": request.build_absolute_uri(reverse('payment-failed')),  # Adjust URLs as per your setup
     }
 
-    form = PayPalPaymentsForm(initial=paypal_dict)
+    paypal_form = PayPalPaymentsForm(initial=paypal_dict)
+    checkout_form = CheckoutForm()
 
     if request.method == 'POST':
-        form = CheckoutForm(request.POST)
-        if form.is_valid():
-            checkout = form.save(commit=False)
-            checkout.total = total
-            checkout.save()
-            checkout.courses.set(cart_courses)
-            checkout.save()
+        if 'paypal_button' in request.POST:
+            # Process PayPal form
+            paypal_form = PayPalPaymentsForm(request.POST, initial=paypal_dict)
+            if paypal_form.is_valid():
+                # Redirect to PayPal for payment
+                return HttpResponse(paypal_form.render())
+        else:
+            # Process Checkout form
+            checkout_form = CheckoutForm(request.POST)
+            if checkout_form.is_valid():
+                checkout = checkout_form.save(commit=False)
+                checkout.total = total
+                checkout.save()
+                checkout.courses.set(cart_courses)
+                checkout.save()
+                # Redirect or render success message for checkout
+                return render(request, 'checkout_success.html', {'checkout': checkout})
 
-            # Redirect to PayPal for payment
-            return HttpResponse(form.render())
-
-    return render(request, 'checkout.html', {'form': form, 'cart_courses': cart_courses, 'total': total, 'cart_count': len(cart)})
-
+    return render(request, 'checkout.html', {'paypal_form': paypal_form, 'checkout_form': checkout_form, 'cart_courses': cart_courses, 'total': total, 'cart_count': len(cart)})
 
 def process_payment(total):
     # Simulate payment processing
