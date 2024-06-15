@@ -146,12 +146,13 @@ def checkout(request):
         if checkout_form.is_valid():
             checkout = checkout_form.save(commit=False)
             checkout.total = total
-            checkout.paypal_transaction_id = request.POST.get('paypal_transaction_id')
             checkout.save()
             checkout.courses.set(cart_courses)
             checkout.save()
-            request.session['cart'] = []  # Clear the cart
-            return redirect('payment-success')
+
+            request.session['checkout_id'] = checkout.id  # Store checkout ID in session
+
+            return HttpResponse(paypal_form.render())
 
     context = {
         'paypal_form': paypal_form,
@@ -159,7 +160,7 @@ def checkout(request):
         'cart_courses': cart_courses,
         'total': total,
         'cart_count': len(cart),
-        'paypal_client_id': settings.PAYPAL_CLIENT_ID,  # Add this line
+        'paypal_client_id': settings.PAYPAL_CLIENT_ID,
     }
     return render(request, 'checkout.html', context)
 
