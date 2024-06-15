@@ -115,13 +115,17 @@ def course_detail(request, id):
 
 
 def checkout(request):
-    cart = request.session.get('cart', {})
-    if not cart:
-        return redirect('cart_view')
+    cart_count = len(request.session.get('cart', []))
+    cart_ids = request.session.get('cart', [])
+    if not cart_ids:
+        return redirect('home')
 
+    cart_courses = Course.objects.filter(id__in=cart_ids)
+    
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
+            total = sum(course.price for course in cart_courses)
             checkout = Checkout(
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name'],
@@ -131,12 +135,10 @@ def checkout(request):
                 state=form.cleaned_data['state'],
                 postal_code=form.cleaned_data['postal_code'],
                 country=form.cleaned_data['country'],
-                total=sum(item['price'] for item in cart.values())
+                total=total
             )
             checkout.save()
-            for course_id, course_data in cart.items():
-                course = Course.objects.get(id=course_id)
-                checkout.courses.add(course)
+            checkout.courses.set(cart_courses)
             # Simulate payment process
             payment_successful = process_payment(checkout.total)
             if payment_successful:
@@ -145,13 +147,15 @@ def checkout(request):
                 checkout.status = 'FAILED'
             checkout.save()
             # Clear the cart
-            request.session['cart'] = {}
+            request.session['cart'] = []
             return render(request, 'checkout_success.html', {'checkout': checkout})
     else:
         form = CheckoutForm()
 
-    return render(request, 'checkout.html', {'form': form})
+    # Calculate the total
+    total = sum(course.price for course in cart_courses)
 
+    return render(request, 'checkout.html', {'form': form, 'cart_courses': cart_courses, 'total': total, 'cart_count':cart_count})
 
 def process_payment(total):
     # Simulate payment processing
