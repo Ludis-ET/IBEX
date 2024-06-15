@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.http import require_POST
 from django.conf import settings
 
 from .models import *
@@ -135,7 +135,7 @@ def checkout(request):
         "currency_code": "USD",
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
         "return_url": request.build_absolute_uri(reverse('payment-success')),
-        "cancel_return": request.build_absolute_uri(reverse('payment-failed')),
+        "cancel_return": request.build_absolute_uri(reverse('payment-error')),
     }
 
     paypal_form = PayPalPaymentsForm(initial=paypal_dict)
@@ -150,33 +150,40 @@ def checkout(request):
             checkout.save()
             checkout.courses.set(cart_courses)
             checkout.save()
+            request.session['checkout_id'] = checkout.id
             return HttpResponse(paypal_form.render())
 
     return render(request, 'checkout.html', {'paypal_form': paypal_form, 'checkout_form': checkout_form, 'cart_courses': cart_courses, 'total': total, 'cart_count': len(cart)})
 
-@require_GET
+
 @csrf_exempt
 def payment_success(request):
-    try:
-        paypal_transaction_id = request.GET.get('PayerID')
-        checkout = Checkout.objects.get(paypal_transaction_id=paypal_transaction_id)
-        checkout.status = 'COMPLETED'
-        checkout.save()
-        return HttpResponse("Payment notification received. Order updated successfully.")
-    except Exception as e:
-        return HttpResponseServerError(f"Error processing payment notification: {e}")
+    checkout_id = request.session.get('checkout_id')
+    if checkout_id:
+        try:
+            checkout = Checkout.objects.get(id=checkout_id)
+            checkout.status = 'COMPLETED'
+            checkout.save()
+            del request.session['checkout_id']
+            request.session['cart'] = []
+            return render(request, 'payment_success.html', {'checkout': checkout})
+        except Checkout.DoesNotExist:
+            return render(request, 'payment_error.html')
+    return redirect('home')
 
-@require_POST
 @csrf_exempt
 def payment_error(request):
-    try:
-        paypal_transaction_id = request.POST.get('PayerID')
-        checkout = Checkout.objects.get(paypal_transaction_id=paypal_transaction_id)
-        checkout.status = 'FAILED'
-        checkout.save()
-        return HttpResponse("Payment notification received. Order update failed.")
-    except Exception as e:
-        return HttpResponseServerError(f"Error processing payment notification: {e}")
+    checkout_id = request.session.get('checkout_id')
+    if checkout_id:
+        try:
+            checkout = Checkout.objects.get(id=checkout_id)
+            checkout.status = 'FAILED'
+            checkout.save()
+            del request.session['checkout_id']
+            return render(request, 'payment_error.html', {'checkout': checkout})
+        except Checkout.DoesNotExist:
+            return render(request, 'payment_error.html')
+    return redirect('home')
 
 def contact(request):
     cart_count = len(request.session.get('cart', []))
