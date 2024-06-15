@@ -16,4 +16,5 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ['title', 'description']
 
 admin.site.register(Category)
+admin.site.register(Checkout)
 admin.site.register(Tag)

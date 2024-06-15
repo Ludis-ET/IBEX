@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.conf import settings
 
 from .models import *
@@ -118,8 +118,7 @@ def course_detail(request, id):
     context = {}
     return render(request, 'course-detail.html', context)
 
-
-@csrf_exempt  # Ensure CSRF exemption depending on your setup
+@csrf_exempt
 def checkout(request):
     cart = request.session.get('cart', [])
     if not cart:
@@ -131,71 +130,53 @@ def checkout(request):
     paypal_dict = {
         "business": settings.PAYPAL_RECEIVER_EMAIL,
         "amount": total,
-        "item_name": "Course Purchase",  # Modify as per your product details
-        "invoice": str(uuid.uuid4()),  # Generate a unique invoice ID
+        "item_name": "Course Purchase",
+        "invoice": str(uuid.uuid4()),
         "currency_code": "USD",
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-        "return_url": request.build_absolute_uri(reverse('payment-success')),  # Adjust URLs as per your setup
-        "cancel_return": request.build_absolute_uri(reverse('payment-failed')),  # Adjust URLs as per your setup
+        "return_url": request.build_absolute_uri(reverse('payment-success')),
+        "cancel_return": request.build_absolute_uri(reverse('payment-failed')),
     }
 
     paypal_form = PayPalPaymentsForm(initial=paypal_dict)
     checkout_form = CheckoutForm()
 
     if request.method == 'POST':
-        if 'paypal_button' in request.POST:
-            # Process PayPal form
-            paypal_form = PayPalPaymentsForm(request.POST, initial=paypal_dict)
-            if paypal_form.is_valid():
-                # Redirect to PayPal for payment
-                return HttpResponse(paypal_form.render())
-        else:
-            # Process Checkout form
-            checkout_form = CheckoutForm(request.POST)
-            if checkout_form.is_valid():
-                checkout = checkout_form.save(commit=False)
-                checkout.total = total
-                checkout.save()
-                checkout.courses.set(cart_courses)
-                checkout.save()
-                # Redirect or render success message for checkout
-                return render(request, 'checkout_success.html', {'checkout': checkout})
+        checkout_form = CheckoutForm(request.POST)
+        if checkout_form.is_valid():
+            checkout = checkout_form.save(commit=False)
+            checkout.total = total
+            checkout.paypal_transaction_id = paypal_dict["invoice"]
+            checkout.save()
+            checkout.courses.set(cart_courses)
+            checkout.save()
+            return HttpResponse(paypal_form.render())
 
     return render(request, 'checkout.html', {'paypal_form': paypal_form, 'checkout_form': checkout_form, 'cart_courses': cart_courses, 'total': total, 'cart_count': len(cart)})
 
-def process_payment(total):
-    # Simulate payment processing
-    # Replace with actual payment processing logic
-    return True  # Assume payment is always successful for this example
-
-
-@require_POST
+@require_GET
 @csrf_exempt
 def payment_success(request):
     try:
-        # Extract data from PayPal IPN request
-        paypal_transaction_id = request.POST.get('txn_id')
-        checkout = get_object_or_404(Checkout, paypal_transaction_id=paypal_transaction_id)
+        paypal_transaction_id = request.GET.get('PayerID')
+        checkout = Checkout.objects.get(paypal_transaction_id=paypal_transaction_id)
         checkout.status = 'COMPLETED'
         checkout.save()
         return HttpResponse("Payment notification received. Order updated successfully.")
     except Exception as e:
         return HttpResponseServerError(f"Error processing payment notification: {e}")
 
-
 @require_POST
 @csrf_exempt
 def payment_error(request):
     try:
-        # Extract data from PayPal IPN request
-        paypal_transaction_id = request.POST.get('txn_id')
-        checkout = get_object_or_404(Checkout, paypal_transaction_id=paypal_transaction_id)
+        paypal_transaction_id = request.POST.get('PayerID')
+        checkout = Checkout.objects.get(paypal_transaction_id=paypal_transaction_id)
         checkout.status = 'FAILED'
         checkout.save()
         return HttpResponse("Payment notification received. Order update failed.")
     except Exception as e:
         return HttpResponseServerError(f"Error processing payment notification: {e}")
-
 
 def contact(request):
     cart_count = len(request.session.get('cart', []))
