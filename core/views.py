@@ -135,7 +135,7 @@ def checkout(request):
         "currency_code": "USD",
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
         "return_url": request.build_absolute_uri(reverse('payment-success')),
-        "cancel_return": request.build_absolute_uri(reverse('payment-error')),
+        "cancel_return": request.build_absolute_uri(reverse('payment-failed')),
     }
 
     paypal_form = PayPalPaymentsForm(initial=paypal_dict)
@@ -146,15 +146,22 @@ def checkout(request):
         if checkout_form.is_valid():
             checkout = checkout_form.save(commit=False)
             checkout.total = total
-            checkout.paypal_transaction_id = paypal_dict["invoice"]
+            checkout.paypal_transaction_id = request.POST.get('paypal_transaction_id')
             checkout.save()
             checkout.courses.set(cart_courses)
             checkout.save()
-            request.session['checkout_id'] = checkout.id
-            return HttpResponse(paypal_form.render())
+            request.session['cart'] = []  # Clear the cart
+            return redirect('payment-success')
 
-    return render(request, 'checkout.html', {'paypal_form': paypal_form, 'checkout_form': checkout_form, 'cart_courses': cart_courses, 'total': total, 'cart_count': len(cart)})
-
+    context = {
+        'paypal_form': paypal_form,
+        'checkout_form': checkout_form,
+        'cart_courses': cart_courses,
+        'total': total,
+        'cart_count': len(cart),
+        'paypal_client_id': settings.PAYPAL_CLIENT_ID,  # Add this line
+    }
+    return render(request, 'checkout.html', context)
 
 @csrf_exempt
 def payment_success(request):

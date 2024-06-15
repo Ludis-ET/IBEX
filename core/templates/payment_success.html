@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="card">
+        <div class="card-body text-center">
+            <h2 class="card-title text-success">Payment Successful</h2>
+            <p class="card-text">Thank you for your purchase, {{ checkout.first_name }}. Your payment has been processed successfully.</p>
+            <a href="{% url 'home' %}" class="btn btn-success mt-3">Return to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

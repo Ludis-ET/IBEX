@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="card">
+        <div class="card-body text-center">
+            <h2 class="card-title text-danger">Payment Failed</h2>
+            <p class="card-text">Sorry, {{ checkout.first_name }}, there was a problem processing your payment. Please try again.</p>
+            <a href="{% url 'checkout' %}" class="btn btn-danger mt-3">Try Again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
