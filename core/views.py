@@ -116,29 +116,22 @@ def course_detail(request, id):
 
 def checkout(request):
     cart_count = len(request.session.get('cart', []))
-    cart_ids = request.session.get('cart', [])
-    if not cart_ids:
+    cart = request.session.get('cart', [])
+    if not cart:
         return redirect('home')
 
-    cart_courses = Course.objects.filter(id__in=cart_ids)
-    
+    cart_courses = Course.objects.filter(id__in=cart)
+    total = sum(course.price for course in cart_courses)
+
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            total = sum(course.price for course in cart_courses)
-            checkout = Checkout(
-                first_name=form.cleaned_data['first_name'],
-                last_name=form.cleaned_data['last_name'],
-                email=form.cleaned_data['email'],
-                address=form.cleaned_data['address'],
-                city=form.cleaned_data['city'],
-                state=form.cleaned_data['state'],
-                postal_code=form.cleaned_data['postal_code'],
-                country=form.cleaned_data['country'],
-                total=total
-            )
+            checkout = form.save(commit=False)
+            checkout.total = total
             checkout.save()
             checkout.courses.set(cart_courses)
+            checkout.save()
+
             # Simulate payment process
             payment_successful = process_payment(checkout.total)
             if payment_successful:
@@ -146,14 +139,11 @@ def checkout(request):
             else:
                 checkout.status = 'FAILED'
             checkout.save()
-            # Clear the cart
+
             request.session['cart'] = []
             return render(request, 'checkout_success.html', {'checkout': checkout})
     else:
         form = CheckoutForm()
-
-    # Calculate the total
-    total = sum(course.price for course in cart_courses)
 
     return render(request, 'checkout.html', {'form': form, 'cart_courses': cart_courses, 'total': total, 'cart_count':cart_count})
 

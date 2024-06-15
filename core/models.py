@@ -1,5 +1,7 @@
+import pycountry
 from django.db import models
 from django.contrib.auth.models import User
+
 
 
 class Category(models.Model):
@@ -46,7 +48,7 @@ class Checkout(models.Model):
     PAYMENT_STATUS_CHOICES = [
         ('PENDING', 'Pending'),
         ('COMPLETED', 'Completed'),
-        ('FAILED', 'Failed'),
+        ('FAILED', 'Failed')
     ]
 
     first_name = models.CharField(max_length=255)
@@ -56,11 +58,15 @@ class Checkout(models.Model):
     city = models.CharField(max_length=255)
     state = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=20)
-    country = models.CharField(max_length=255)
-    courses = models.ManyToManyField(Course, related_name='checkouts')
+    country = models.CharField(
+        max_length=255,
+        choices=[(country.name, country.name) for country in pycountry.countries],
+        default='United States'
+    )
+    courses = models.ManyToManyField(Course)
     total = models.DecimalField(decimal_places=2, max_digits=6)
     date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='PENDING')
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} - {self.date}'
+        return f'{self.first_name} {self.last_name} - {self.total}'
