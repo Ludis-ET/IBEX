@@ -152,7 +152,6 @@ def checkout(request):
 
             request.session['checkout_id'] = checkout.id  # Store checkout ID in session
 
-            return HttpResponse(paypal_form.render())
 
     context = {
         'paypal_form': paypal_form,
