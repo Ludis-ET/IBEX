@@ -73,7 +73,8 @@
                         {% endfor %}
                     </ul>
                     <p class="text-right font-weight-bold">Total: ${{ total }}</p>
-                    <button type="submit" class="btn btn-primary btn-block">Checkout</button>
+                    {% comment %} Display PayPal button {% endcomment %}
+                    {{ paypal.render }}  {# Renders PayPal payment button #}
                 </div>
             </div>
         </div>
