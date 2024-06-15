@@ -134,8 +134,8 @@ def checkout(request):
         "invoice": str(uuid.uuid4()),
         "currency_code": "USD",
         "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
-        "return_url": request.build_absolute_uri(reverse('payment-success')),
-        "cancel_return": request.build_absolute_uri(reverse('payment-failed')),
+        "return_url": request.build_absolute_uri(reverse('home')),
+        "cancel_return": request.build_absolute_uri(reverse('home')),
     }
 
     paypal_form = PayPalPaymentsForm(initial=paypal_dict)
@@ -151,7 +151,7 @@ def checkout(request):
             checkout.save()
 
             request.session['checkout_id'] = checkout.id  # Store checkout ID in session
-
+            return redirect(reverse('paypal_checkout', kwargs={'checkout_id': checkout.id}))
 
     context = {
         'paypal_form': paypal_form,
@@ -164,34 +164,41 @@ def checkout(request):
     return render(request, 'checkout.html', context)
 
 @csrf_exempt
-def payment_success(request):
-    checkout_id = request.session.get('checkout_id')
-    if checkout_id:
-        try:
-            checkout = Checkout.objects.get(id=checkout_id)
-            checkout.status = 'COMPLETED'
-            checkout.save()
-            del request.session['checkout_id']
-            request.session['cart'] = []
-            return render(request, 'payment_success.html', {'checkout': checkout})
-        except Checkout.DoesNotExist:
-            return render(request, 'payment_error.html')
-    return redirect('home')
+def paypal_checkout(request, checkout_id):
+    try:
+        checkout = Checkout.objects.get(id=checkout_id)
+    except Checkout.DoesNotExist:
+        return HttpResponse("Checkout not found", status=404)
 
-@csrf_exempt
-def payment_error(request):
-    checkout_id = request.session.get('checkout_id')
-    if checkout_id:
-        try:
-            checkout = Checkout.objects.get(id=checkout_id)
-            checkout.status = 'FAILED'
-            checkout.save()
-            del request.session['checkout_id']
-            return render(request, 'payment_error.html', {'checkout': checkout})
-        except Checkout.DoesNotExist:
-            return render(request, 'payment_error.html')
-    return redirect('home')
+    # Ensure checkout status is marked as completed
+    checkout.status = 'COMPLETED'
+    checkout.save()
 
+    paypal_dict = {
+        "business": settings.PAYPAL_RECEIVER_EMAIL,
+        "amount": checkout.total,
+        "item_name": "Course Purchase",
+        "invoice": str(uuid.uuid4()),
+        "currency_code": "USD",
+        "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+        "return_url": request.build_absolute_uri(reverse('home')),
+        "cancel_return": request.build_absolute_uri(reverse('home')),
+        "custom": checkout_id,  # Pass checkout ID as custom parameter
+    }
+
+    paypal_form = PayPalPaymentsForm(initial=paypal_dict)
+    checkout_form = CheckoutForm(instance=checkout)
+    request.session['cart'] = []  # Clear the cart after successful payment
+
+    context = {
+        'paypal_form': paypal_form,
+        'checkout_form': checkout_form,
+        'cart_courses': checkout.courses.all(),
+        'total': checkout.total,
+        'cart_count': checkout.courses.count(),
+        'paypal_client_id': settings.PAYPAL_CLIENT_ID,
+    }
+    return render(request, 'payment_success.html', context)
 def contact(request):
     cart_count = len(request.session.get('cart', []))
     context = {
