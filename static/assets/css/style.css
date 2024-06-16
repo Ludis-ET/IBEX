@@ -569,7 +569,7 @@ img {
 ====================*/
 #mu-abtus-counter {
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("../img/draw.jpg");
+    url("../bg.avif");
   background-repeat: no-repeat;
   background-size: 100%;
   display: inline;
@@ -1018,7 +1018,7 @@ img {
 ====================*/
 #mu-testimonial {
   background-attachment: fixed;
-  background: url("../img/grad.jpg");
+  background: url("../bg.avif");
   background-position: center center;
   background-size: cover;
   display: inline;

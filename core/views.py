@@ -16,8 +16,10 @@ import uuid
 
 def index(request):
     cart_count = len(request.session.get('cart', []))
+    courses = Course.objects.order_by('-id')
     context = {
         "cart_count": cart_count,
+        'courses':courses,
     }
     return render(request, 'index.html', context)
 
@@ -73,9 +75,9 @@ def blog_post(request, id):
 
 def courses(request):
     courses = Course.objects.all()
-    categories = Category.objects.all()
+    categories = Category.objects.all().order_by('-id')
     tags = Tag.objects.all()
-    paginator = Paginator(courses, 6)
+    paginator = Paginator(courses, 4)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     cart_count = len(request.session.get('cart', []))

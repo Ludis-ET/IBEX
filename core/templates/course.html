@@ -26,32 +26,43 @@
               <div class="mu-course-container">
                 <div class="row">
                   {% for course in page_obj %}
-<div class="col-md-6 col-sm-6">
-    <div class="mu-latest-course-single">
-        <figure class="mu-latest-course-img">
-            <a href="#"><img src="{{ course.poster.url }}" alt="img" /></a>
-            <figcaption class="mu-latest-course-imgcaption">
-                <h4><a href="#">{{ course.title }}</a></h4>
-                <span><i class="fa fa-clock-o"></i>{{ course.interval }}</span>
-            </figcaption>
-        </figure>
-        <div class="mu-latest-course-single-content">
-            <p>{{ course.description | slice:":250"}}...</p>
-            <div class="mu-latest-course-single-contbottom">
-              {% if course.id in cart_ids %}
-                  <a class="mu-course-details" href="{% url 'remove_from_cart' course.id %}">Remove from Cart</a>
-              {% else %}
-                  <a class="mu-course-details" href="{% url 'add_to_cart' course.id %}">Add to Cart</a>
-              {% endif %}
-                <span class="mu-course-price">${{ course.price }}</span>
-                
-            </div>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-
+                  <div class="col-md-6 mt-4 col-sm-6">
+                    <div class="mu-latest-course-single">
+                      <figure class="mu-latest-course-img">
+                        <a href="#"
+                          ><img src="{{ course.poster.url }}" alt="img"
+                        /></a>
+                        <figcaption class="mu-latest-course-imgcaption">
+                          <h4><a href="#">{{ course.title }}</a></h4>
+                          <span
+                            ><i class="fa fa-clock-o"></i>{{ course.interval }}</span
+                          >
+                        </figcaption>
+                      </figure>
+                      <div class="mu-latest-course-single-content">
+                        <p style="height:125px;">{{ course.description | slice:":250"}}</p>
+                        <div class="mu-latest-course-single-contbottom">
+                          {% if course.id in cart_ids %}
+                          <a
+                            class="mu-course-details"
+                            href="{% url 'remove_from_cart' course.id %}"
+                            >Remove from Cart</a
+                          >
+                          {% else %}
+                          <a
+                            class="mu-course-details"
+                            href="{% url 'add_to_cart' course.id %}"
+                            >Add to Cart</a
+                          >
+                          {% endif %}
+                          <span class="mu-course-price"
+                            >${{ course.price }}</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
                 </div>
               </div>
               <!-- end course content container -->
@@ -146,7 +157,8 @@
                 </div>
                 <!-- end single sidebar -->
                 <!-- start single sidebar -->
-                {% comment %} <div class="mu-single-sidebar">
+                {% comment %}
+                <div class="mu-single-sidebar">
                   <h3>Archives</h3>
                   <ul class="mu-sidebar-catg mu-sidebar-archives">
                     <li>
@@ -168,7 +180,8 @@
                       <a href="">October <span>(85)</span></a>
                     </li>
                   </ul>
-                </div> {% endcomment %}
+                </div>
+                {% endcomment %}
                 <!-- end single sidebar -->
                 <!-- start single sidebar -->
                 <div class="mu-single-sidebar">
