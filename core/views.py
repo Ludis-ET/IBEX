@@ -22,6 +22,14 @@ def index(request):
     return render(request, 'index.html', context)
 
 
+def projects(request):
+    cart_count = len(request.session.get('cart', []))
+    context = {
+        "cart_count": cart_count,
+    }
+    return render(request, 'projects.html', context)
+
+
 def about_us(request):
     cart_count = len(request.session.get('cart', []))
     context = {
