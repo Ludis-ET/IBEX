@@ -16,6 +16,7 @@ platformdirs==4.2.2
 pycountry==24.6.1
 pycparser==2.22
 pyOpenSSL==24.1.0
+python-dotenv==1.0.1
 pytz==2024.1
 requests==2.32.3
 setuptools==70.0.0
