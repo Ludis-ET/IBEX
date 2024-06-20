@@ -23,9 +23,10 @@ class BlogAdmin(admin.ModelAdmin):
         }),
         ('Additional Information', {
             'classes': ('collapse',),
-            'fields': ('tags')
+            'fields': ('tags',)
         }),
     )
+
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):

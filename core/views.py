@@ -77,7 +77,7 @@ def courses(request):
     courses = Course.objects.all()
     categories = Category.objects.all().order_by('-id')
     tags = Tag.objects.all()
-    paginator = Paginator(courses, 4)
+    paginator = Paginator(courses, 2)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     cart_count = len(request.session.get('cart', []))
