@@ -13,6 +13,7 @@ packaging==24.1
 pillow==10.3.0
 pipenv==2024.0.0
 platformdirs==4.2.2
+psycopg2==2.9.9
 pycountry==24.6.1
 pycparser==2.22
 pyOpenSSL==24.1.0
