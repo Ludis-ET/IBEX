@@ -23,7 +23,7 @@ class BlogAdmin(admin.ModelAdmin):
         }),
         ('Additional Information', {
             'classes': ('collapse',),
-            'fields': ('posted_date', 'tags')
+            'fields': ('tags')
         }),
     )
 
