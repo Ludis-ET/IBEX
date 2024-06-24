@@ -14,13 +14,7 @@
       type="image/x-icon"
     />
 
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Font awesome -->
     <link href="{% static 'assets/css/font-awesome.css' %}" rel="stylesheet" />
     <!-- Bootstrap -->
@@ -31,8 +25,90 @@
       type="text/css"
       href="{% static 'assets/css/slick.css' %}"
     />
+    <style>
 
-    {% block css %} {% endblock %}
+      #ex4 .p1[data-count]:after{
+  position:absolute;
+  right:10%;
+  top:8%;
+  content: attr(data-count);
+  font-size:40%;
+  padding:.2em;
+  border-radius:50%;
+  line-height:1em;
+  color: white;
+  background:rgba(255,0,0,.85);
+  text-align:center;
+  min-width: 1em;
+  //font-weight:bold;
+}
+
+
+#ex3 .fa-stack[data-count]:after{
+  position:absolute;
+  right:0%;
+  top:1%;
+  content: attr(data-count);
+  font-size:30%;
+  padding:.6em;
+  border-radius:50%;
+  line-height:.8em;
+  color: white;
+  background:rgba(255,0,0,.85);
+  text-align:center;
+  min-width: 1em;
+  font-weight:bold;
+}
+
+
+/* on ex2 if you include bootstrap v3 css the number is a rounded circle with the .has-badge class */
+#ex2 .fa-stack[data-count]:after{
+  position:absolute;
+  right:0%;
+  top:1%;
+  content: attr(data-count);
+  font-size:30%;
+  padding:.6em;
+  border-radius:999px;
+  line-height:.75em;
+  color: white;
+  background:rgba(255,0,0,.85);
+  text-align:center;
+  min-width:2em;
+  font-weight:bold;
+  padding:5px;
+}
+
+
+
+
+#ex1 .icon-grey {color: grey}
+#ex1 i {   
+    width:100px;
+    text-align:center;
+    vertical-align:middle;
+    position: relative;
+}
+#ex1 .badge:after{
+    content:"100";
+    position: absolute;
+    background: rgba(0,0,255,1);
+    height:2rem;
+    top:1rem;
+    right:1.5rem;
+    width:2.5rem;
+    text-align: center;
+    line-height: 2rem;;
+    font-size: 1rem;
+    border-radius: 50%;
+    color:white;
+    border:1px solid blue;
+}
+    </style>
+
+    {% block css %}
+
+    {% endblock %}
     <!-- Fancybox slider -->
     <link
       rel="stylesheet"
@@ -168,19 +244,13 @@
               <li><a href="{% url 'contact' %}">Contact Us</a></li>
               {% if cart_count > 0 %}
               <li id="ex4">
-                <a
-                  href="{% url 'view_cart' %}"
-                  class="p1 fa-stack fa-2x has-badge"
-                  data-count="{{cart_count}}"
-                >
-                  <!--<i class="p2 fa fa-circle fa-stack-2x"></i>-->
-                  <i
-                    class="p3 fa fa-shopping-cart fa-stack-1x xfa-inverse"
-                    data-count="4b"
-                  ></i>
-                </a>
-              </li>
-              {% endif %} {% comment %}
+  <a href="{% url 'view_cart' %}" class="p1 fa-stack fa-2x has-badge" data-count="{{cart_count}}">
+    <!--<i class="p2 fa fa-circle fa-stack-2x"></i>-->
+    <i class="p3 fa fa-shopping-cart fa-stack-1x xfa-inverse" data-count="4b"></i>
+  </a>
+</li>
+{% endif %}
+              {% comment %}
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"
                   >Blog <span class="fa fa-angle-down"></span
@@ -200,27 +270,25 @@
         </div>
       </nav>
     </section>
-    <div id="mu-search">
-      <div class="mu-search-area">
-        <button class="mu-search-close">
-          <span class="fa fa-close"></span>
-        </button>
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12">
-              <form class="mu-search-form">
-                <input
-                  type="search"
-                  placeholder="Type Your Keyword(s) & Hit Enter"
-                />
-              </form>
-            </div>
-          </div>
+<div id="mu-search">
+  <div class="mu-search-area">
+    <button class="mu-search-close"><span class="fa fa-close"></span></button>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <form class="mu-search-form">
+            <input
+              type="search"
+              placeholder="Type Your Keyword(s) & Hit Enter"
+            />
+          </form>
         </div>
       </div>
     </div>
-    <!-- End search box -->
-    <!-- Page breadcrumb -->
+  </div>
+</div>
+<!-- End search box -->
+<!-- Page breadcrumb -->
     {%block body%} {% endblock %}
 
     <!-- End from blog -->
@@ -232,20 +300,11 @@
         <div class="container">
           <div class="mu-footer-top-area">
             <div class="row">
-              <div style="color: #fff" class="col-lg-6 col-md-6 col-sm-3">
-                <h4>About IBEX</h4>
-                <p>
-                  IBEX is a leading provider of data analytics education,
-                  offering comprehensive courses designed to equip learners with
-                  practical skills and industry knowledge. Our mission is to
-                  empower individuals and businesses through data-driven
-                  insights and expertise.
-                </p>
-                <p>
-                  Join thousands of students worldwide who have transformed
-                  their careers with IBEX.
-                </p>
-              </div>
+              <div style="color:#fff;" class="col-lg-6 col-md-6 col-sm-3">
+    <h4>About IBEX</h4>
+    <p>IBEX is a leading provider of data analytics education, offering comprehensive courses designed to equip learners with practical skills and industry knowledge. Our mission is to empower individuals and businesses through data-driven insights and expertise.</p>
+    <p>Join thousands of students worldwide who have transformed their careers with IBEX.</p>
+</div>
 
               <div class="col-lg-3 col-md-3 col-sm-3">
                 <div class="mu-footer-widget">
@@ -295,8 +354,8 @@
         <div class="container">
           <div class="mu-footer-bottom-area">
             <p>
-              &copy; All Right Reserved. Designed by {% comment %}
-              <a href="http://www.markups.io/" rel="nofollow">MarkUps.io</a> {%endcomment %}
+              &copy; All Right Reserved. Designed by
+              {% comment %} <a href="http://www.markups.io/" rel="nofollow">MarkUps.io</a> {% endcomment %}
               <a>Ludis</a>
             </p>
           </div>
@@ -306,7 +365,9 @@
     </footer>
     <!-- End footer -->
 
-    {% block js %} {% endblock %}
+    {% block js %}
+
+    {% endblock %}
     <!-- jQuery library -->
     <script src="{% static 'assets/js/jquery.min.js' %}"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
